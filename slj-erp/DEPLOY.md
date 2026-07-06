@@ -30,10 +30,13 @@ In [Supabase Dashboard → API](https://supabase.com/dashboard/project/dpnkkyzfe
 | Variable | Location |
 |----------|----------|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://dpnkkyzfehjqxlhdgpma.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Settings → API → anon public |
-| `SUPABASE_SERVICE_ROLE_KEY` | Settings → API → service_role |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | [API Keys](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api-keys) → publishable (`sb_publishable_...`) |
+| `SUPABASE_SECRET_KEY` | Same page → secret (`sb_secret_...`) — server only |
+| `SUPABASE_JWKS_URL` | `https://dpnkkyzfehjqxlhdgpma.supabase.co/auth/v1/.well-known/jwks.json` |
 | `DATABASE_URL` | Settings → Database → URI (Transaction/pooler, port **6543**) |
 | `DIRECT_URL` | Settings → Database → URI (Session/direct, port **5432**) |
+
+Legacy fallbacks still work: `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
 
 For `DATABASE_URL`, append `?pgbouncer=true` if using the pooler.
 
@@ -78,8 +81,10 @@ Supabase → Authentication → URL Configuration:
 3. **Root Directory** → `slj-erp` (required)
 4. **Framework Preset** → **Next.js** (not "Other")
 5. **Output Directory** → leave **empty** (do not set `public` — Next.js uses `.next` internally)
-6. Add environment variables (all 5 from Step 1a)
+6. Add environment variables (all 7 from Step 1a)
 7. Deploy
+
+After any env var change, **Redeploy** — `NEXT_PUBLIC_*` values are baked in at build time.
 
 ### Option B — Vercel CLI
 
@@ -120,14 +125,15 @@ Push to `main` to trigger deploy.
 ## Environment variables checklist (Vercel)
 
 ```
-NEXT_PUBLIC_SUPABASE_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY
-SUPABASE_SERVICE_ROLE_KEY
-DATABASE_URL
-DIRECT_URL
+NEXT_PUBLIC_SUPABASE_URL=https://dpnkkyzfehjqxlhdgpma.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+SUPABASE_SECRET_KEY=sb_secret_...
+SUPABASE_JWKS_URL=https://dpnkkyzfehjqxlhdgpma.supabase.co/auth/v1/.well-known/jwks.json
+DATABASE_URL=postgresql://...:6543/postgres?pgbouncer=true
+DIRECT_URL=postgresql://...:5432/postgres
 ```
 
-All must be set for **Production**, **Preview**, and **Development** in Vercel.
+All must be set for **Production**, **Preview**, and **Development** in Vercel, then **redeploy**.
 
 ---
 
@@ -141,3 +147,4 @@ All must be set for **Production**, **Preview**, and **Development** in Vercel.
 | 404 NOT_FOUND | Set Root Directory to `slj-erp` in Vercel → General → Redeploy |
 | No Output Directory named "public" | Vercel → Project Settings → General → clear **Output Directory** (leave blank) and set **Framework Preset** to **Next.js**, then redeploy |
 | Redirects to Vercel SSO login | Disable **Deployment Protection** for Production in Vercel → Settings → Deployment Protection |
+| "URL and Key are required" (Supabase) | Add `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel env vars, then **Redeploy** (not just Restart) |
