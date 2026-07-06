@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model ShopSettings {
+  id                 String  @id @default("singleton")
+  shopName           String  @default("Sri Lakshmi Jewellery")
+  address            String  @default("")
+  city               String  @default("Tiruppur")
+  state              String  @default("Tamil Nadu")
+  pincode            String  @default("")
+  phone              String  @default("")
+  email              String  @default("")
+  gstin              String  @default("")
+  bankDetails        String  @default("")
+  logoUrl            String  @default("")
+  financialYearStart Int     @default(4)
+}
+
+model Item {
+  id                String          @id @default(cuid())
+  itemCode          String          @unique
+  itemName          String
+  category          Category
+  karat             String?
+  hsnCode           String          @default("7113")
+  makingChargeType  MakingType
+  makingChargeValue Decimal         @db.Decimal(10, 2)
+  isActive          Boolean         @default(true)
+  notes             String?
+  createdAt         DateTime        @default(now())
+  billItems         SalesBillItem[]
+}
+
+model Customer {
+  id             String        @id @default(cuid())
+  customerCode   String        @unique
+  name           String
+  phone          String        @unique
+  phoneAlt       String?
+  address        String        @default("")
+  city           String        @default("Tiruppur")
+  state          String        @default("Tamil Nadu")
+  pincode        String        @default("")
+  gstin          String?
+  panNumber      String?
+  aadharNumber   String?
+  customerType   CustomerType  @default(RETAIL)
+  creditLimit    Decimal       @default(0) @db.Decimal(10, 2)
+  openingBalance Decimal       @default(0) @db.Decimal(10, 2)
+  isActive       Boolean       @default(true)
+  notes          String?
+  dateJoined     DateTime      @default(now())
+  bills          SalesBill[]
+}
+
+model DailyRate {
+  id          String   @id @default(cuid())
+  date        DateTime @unique @db.Date
+  gold24kRate Decimal  @db.Decimal(10, 2)
+  gold22kRate Decimal  @db.Decimal(10, 2)
+  gold18kRate Decimal  @db.Decimal(10, 2)
+  silverRate  Decimal  @db.Decimal(10, 2)
+  enteredBy   String
+  createdAt   DateTime @default(now())
+  notes       String?
+}
+
+model SalesBill {
+  id             String          @id @default(cuid())
+  billNumber     String          @unique
+  billDate       DateTime        @db.Date
+  billType       BillType        @default(CASH)
+  customerId     String?
+  customer       Customer?       @relation(fields: [customerId], references: [id])
+  walkInName     String?
+  subtotal       Decimal         @db.Decimal(10, 2)
+  cgstAmount     Decimal         @default(0) @db.Decimal(10, 2)
+  sgstAmount     Decimal         @default(0) @db.Decimal(10, 2)
+  igstAmount     Decimal         @default(0) @db.Decimal(10, 2)
+  discountAmount Decimal         @default(0) @db.Decimal(10, 2)
+  roundOff       Decimal         @default(0) @db.Decimal(5, 2)
+  totalAmount    Decimal         @db.Decimal(10, 2)
+  amountPaid     Decimal         @db.Decimal(10, 2)
+  balanceDue     Decimal         @db.Decimal(10, 2)
+  paymentMode    PaymentMode     @default(CASH)
+  status         BillStatus      @default(DRAFT)
+  createdBy      String
+  createdAt      DateTime        @default(now())
+  notes          String?
+  items          SalesBillItem[]
+}
+
+model SalesBillItem {
+  id                 String     @id @default(cuid())
+  billId             String
+  bill               SalesBill  @relation(fields: [billId], references: [id], onDelete: Cascade)
+  itemId             String
+  item               Item       @relation(fields: [itemId], references: [id])
+  tagNumber          String?
+  description        String
+  grossWeight        Decimal    @db.Decimal(10, 3)
+  stoneWeight        Decimal    @default(0) @db.Decimal(10, 3)
+  netWeight          Decimal    @db.Decimal(10, 3)
+  wastagePercent     Decimal    @default(0) @db.Decimal(5, 2)
+  wastageWeight      Decimal    @default(0) @db.Decimal(10, 3)
+  totalWeight        Decimal    @db.Decimal(10, 3)
+  ratePerGram        Decimal    @db.Decimal(10, 2)
+  goldValue          Decimal    @db.Decimal(10, 2)
+  makingChargeType   MakingType
+  makingChargeValue  Decimal    @db.Decimal(10, 2)
+  makingChargeAmount Decimal    @db.Decimal(10, 2)
+  stoneCharge        Decimal    @default(0) @db.Decimal(10, 2)
+  taxableAmount      Decimal    @db.Decimal(10, 2)
+  gstRate            Decimal    @default(3.0) @db.Decimal(5, 2)
+  gstAmount          Decimal    @db.Decimal(10, 2)
+  lineTotal          Decimal    @db.Decimal(10, 2)
+  sortOrder          Int        @default(0)
+}
+
+enum Category {
+  GOLD
+  SILVER
+  DIAMOND
+  STONE
+  OTHER
+}
+
+enum MakingType {
+  PER_GRAM
+  PERCENTAGE
+  FIXED
+}
+
+enum CustomerType {
+  RETAIL
+  WHOLESALE
+  VIP
+}
+
+enum BillType {
+  CASH
+  CREDIT
+  EXCHANGE
+}
+
+enum PaymentMode {
+  CASH
+  CARD
+  UPI
+  CHEQUE
+  MULTIPLE
+}
+
+enum BillStatus {
+  DRAFT
+  CONFIRMED
+  CANCELLED
+}
