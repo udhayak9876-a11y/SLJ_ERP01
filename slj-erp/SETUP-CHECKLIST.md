@@ -10,7 +10,7 @@
 | Step | Status | Action |
 |------|--------|--------|
 | Vercel deployed | Done | — |
-| Supabase URL + anon key | Done | Verify in Vercel env vars |
+| Supabase URL + publishable key | Done | Verify in Vercel env vars |
 | Database tables | **Not done** | Run SQL migration (Step 1 below) |
 | DATABASE_URL in Vercel | **Likely missing** | Add from Supabase (Step 2) |
 | Admin user in Supabase | **Check** | Create user (Step 3) |
@@ -39,12 +39,14 @@ Set these for **Production**, **Preview**, and **Development**:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://dpnkkyzfehjqxlhdgpma.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<your anon key>
-SUPABASE_SERVICE_ROLE_KEY=<from Supabase API settings>
-DATABASE_URL=<Transaction mode, port 6543 — from Database settings>
-DIRECT_URL=<Session mode, port 5432 — from Database settings>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_7VBZjB_il1gU_x9cufn8Hg_v9Nyej8c
+SUPABASE_SECRET_KEY=<full sb_secret_ key from API Keys settings>
+SUPABASE_JWKS_URL=https://dpnkkyzfehjqxlhdgpma.supabase.co/auth/v1/.well-known/jwks.json
+DATABASE_URL=<Transaction mode, port 6543>
+DIRECT_URL=<Session mode, port 5432>
 ```
 
+Get keys: [API Keys settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api-keys)  
 Get database strings: [Database Settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/database)
 
 After adding/changing vars → **Redeploy** (Deployments → ⋯ → Redeploy).

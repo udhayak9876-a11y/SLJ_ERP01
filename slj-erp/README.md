@@ -37,8 +37,9 @@ Copy `.env.example` to `.env.local` and fill in values from Supabase:
 | Variable | Source |
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://dpnkkyzfehjqxlhdgpma.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | [API settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api) → anon public |
-| `SUPABASE_SERVICE_ROLE_KEY` | [API settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api) → service_role |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | [API Keys](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api-keys) → publishable |
+| `SUPABASE_SECRET_KEY` | [API Keys](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api-keys) → secret |
+| `SUPABASE_JWKS_URL` | `https://dpnkkyzfehjqxlhdgpma.supabase.co/auth/v1/.well-known/jwks.json` |
 | `DATABASE_URL` | [Database settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/database) → Transaction (port 6543) |
 | `DIRECT_URL` | [Database settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/database) → Session (port 5432) |
 
