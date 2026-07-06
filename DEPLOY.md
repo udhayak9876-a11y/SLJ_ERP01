@@ -42,10 +42,8 @@ For `DATABASE_URL`, append `?pgbouncer=true` if using the pooler.
 **Option A — Prisma (recommended)**
 
 ```bash
-cd slj-erp
 cp .env.example .env.local
 # Edit .env.local with your values
-chmod +x scripts/setup-supabase.sh
 ./scripts/setup-supabase.sh
 ```
 
@@ -77,7 +75,7 @@ Supabase → Authentication → URL Configuration:
 
 1. Go to [vercel.com/new](https://vercel.com/new)
 2. Import `udhayak9876-a11y/SLJ_ERP01`
-3. Set **Root Directory** → `slj-erp`
+3. **Root Directory** → leave **empty** (do not use `slj-erp`)
 4. Framework: Next.js (auto-detected)
 5. Add environment variables (all 5 from Step 1a)
 6. Deploy
@@ -85,7 +83,6 @@ Supabase → Authentication → URL Configuration:
 ### Option B — Vercel CLI
 
 ```bash
-cd slj-erp
 npx vercel login
 npx vercel link        # create/link project
 npx vercel env add     # add each env var for Production
@@ -140,4 +137,4 @@ All must be set for **Production**, **Preview**, and **Development** in Vercel.
 | Login fails | Check Supabase Site URL matches Vercel domain |
 | Database errors | Run `npx prisma db push` or apply SQL migration |
 | Build fails on Prisma | Ensure `DATABASE_URL` is set in Vercel env |
-| 404 on routes | Confirm Root Directory is `slj-erp` |
+| 404 on routes | Clear Root Directory in Vercel (must be empty, not `slj-erp`) |

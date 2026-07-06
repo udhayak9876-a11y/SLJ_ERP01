@@ -24,7 +24,7 @@
 Tables are **not** in Supabase yet (`ShopSettings` table missing).
 
 1. Open [Supabase SQL Editor](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/sql/new)
-2. Copy **all** of `slj-erp/supabase/migrations/20260706120000_init.sql`
+2. Copy **all** of `supabase/migrations/20260706120000_init.sql`
 3. Click **Run**
 
 You should see: Success. No rows returned.
@@ -92,7 +92,10 @@ Your app currently redirects to Vercel login (not your ERP login).
 
 ---
 
-## Root directory check
+## Vercel root directory (important)
 
-If pages show 404, confirm Vercel **Root Directory** = `slj-erp`  
-(Settings → General → Root Directory)
+The app now lives at the **repository root** (not in a subfolder).
+
+1. Vercel → **slj-erp-01** → Settings → **General** → Root Directory
+2. Set to **empty** (`.` or leave blank) — **NOT** `slj-erp`
+3. Save and **Redeploy**
