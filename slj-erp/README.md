@@ -2,6 +2,16 @@
 
 Web-based billing ERP for **Sri Lakshmi Jewellery**, Tiruppur, Tamil Nadu.
 
+## Vercel — Root Directory (required)
+
+In Vercel project settings → **General → Root Directory**, set:
+
+```
+slj-erp
+```
+
+Without this you get `404: NOT_FOUND`. See [SETUP-CHECKLIST.md](./SETUP-CHECKLIST.md).
+
 ## Tech Stack
 
 - Next.js 14 (App Router) + TypeScript
@@ -10,92 +20,31 @@ Web-based billing ERP for **Sri Lakshmi Jewellery**, Tiruppur, Tamil Nadu.
 - Tailwind CSS + shadcn/ui
 - Vercel deployment
 
-## Phase 1 Modules
-
-- Authentication (email/password via Supabase)
-- Shop settings
-- Item master
-- Customer master (+ quick-add from billing)
-- Daily gold/silver rate entry
-- Sales bill creation with auto-calculations
-- GST tax invoice print view
-- Dashboard & bills list
-
 ## Getting Started
-
-### 1. Install dependencies
 
 ```bash
 cd slj-erp
 npm install
-```
-
-### 2. Environment variables
-
-Copy `.env.example` to `.env.local` and fill in values from Supabase:
-
-| Variable | Source |
-|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API → Project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API → anon public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role key |
-| `DATABASE_URL` | Supabase → Database → Connection string (Transaction/pooler mode) |
-| `DIRECT_URL` | Supabase → Database → Connection string (Session/direct mode) |
-
-### 3. Database setup
-
-```bash
-npx prisma generate
-npx prisma db push
-```
-
-### 4. Create admin user
-
-Create users manually in Supabase Dashboard → Authentication → Users (no self-registration).
-
-### 5. Run locally
-
-```bash
+cp .env.example .env.local
+# fill in Supabase credentials
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and sign in.
+## Environment variables (Vercel)
 
-## Vercel Deployment
+| Variable | Value |
+|----------|-------|
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://dpnkkyzfehjqxlhdgpma.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | from Supabase API Keys |
+| `SUPABASE_SECRET_KEY` | from Supabase API Keys |
+| `SUPABASE_JWKS_URL` | `https://dpnkkyzfehjqxlhdgpma.supabase.co/auth/v1/.well-known/jwks.json` |
+| `DATABASE_URL` | Transaction mode (port 6543) |
+| `DIRECT_URL` | Session mode (port 5432) |
 
-Set the **Root Directory** to `slj-erp` in Vercel project settings.
-
-Add the same environment variables in the Vercel dashboard, then deploy:
+## Database setup
 
 ```bash
-vercel --prod
+./scripts/setup-supabase.sh
 ```
 
-`vercel.json` is included with:
-
-```json
-{
-  "buildCommand": "prisma generate && next build",
-  "installCommand": "npm install"
-}
-```
-
-## Indian Business Conventions
-
-- Currency: ₹ lakh format (₹1,25,000)
-- Weight: grams, 3 decimal places
-- Dates: DD-MM-YYYY
-- GST: 3% on jewellery (CGST+SGST intra-state, IGST inter-state)
-- Bill numbers: `SLJ/YY-YY/NNNN` (financial year April–March)
-
-## Project Structure
-
-```
-slj-erp/
-├── app/(auth)/login/       # Login page
-├── app/(dashboard)/        # All ERP screens
-├── components/             # UI, bills, items, customers
-├── lib/                    # Supabase, Prisma, utils, server actions
-├── prisma/schema.prisma    # Database schema
-└── middleware.ts           # Auth protection
-```
+Or run `supabase/migrations/20260706120000_init.sql` in Supabase SQL Editor.
