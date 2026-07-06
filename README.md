@@ -6,12 +6,22 @@ The Next.js application is in [`slj-erp/`](./slj-erp/).
 
 ## Vercel deployment (required)
 
-In Vercel → **Settings → General → Root Directory**, set:
+In Vercel → **slj-erp-01** → **Settings → Build and Deployment**:
 
-```
-slj-erp
-```
+| Setting | Value |
+|---------|-------|
+| **Root Directory** | `slj-erp` |
+| **Framework Preset** | **Next.js** |
+| **Build Command** | leave default (or turn **Override** off) |
+| **Output Directory** | leave **empty** — turn **Override** off if it says `public` |
+| **Install Command** | leave default |
 
-Then redeploy. Without this, you will get `404: NOT_FOUND`.
+If **Output Directory** is set to `public`, Vercel treats the app as a static site and fails with:
 
-See [slj-erp/README.md](./slj-erp/README.md) and [slj-erp/SETUP-CHECKLIST.md](./slj-erp/SETUP-CHECKLIST.md) for full setup.
+> No Output Directory named "public" found after the Build completed
+
+See [Vercel: Missing public directory](https://vercel.com/docs/errors/error-list#missing-public-directory).
+
+After changing settings → **Deployments** → **Redeploy**.
+
+See [slj-erp/DEPLOY.md](./slj-erp/DEPLOY.md) and [slj-erp/SETUP-CHECKLIST.md](./slj-erp/SETUP-CHECKLIST.md) for full setup.

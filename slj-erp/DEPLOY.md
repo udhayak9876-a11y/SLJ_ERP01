@@ -76,15 +76,32 @@ Supabase → Authentication → URL Configuration:
 
 ### Option A — Vercel Dashboard (easiest)
 
-1. Go to [vercel.com/new](https://vercel.com/new)
+1. Go to [vercel.com/new](https://vercel.com/new) (or open existing **slj-erp-01** project)
 2. Import `udhayak9876-a11y/SLJ_ERP01`
-3. **Root Directory** → `slj-erp` (required)
-4. **Framework Preset** → **Next.js** (not "Other")
-5. **Output Directory** → leave **empty** (do not set `public` — Next.js uses `.next` internally)
-6. Add environment variables (all 7 from Step 1a)
-7. Deploy
+3. Open **Settings → Build and Deployment** and set:
+
+| Setting | Value |
+|---------|-------|
+| Root Directory | `slj-erp` |
+| Framework Preset | **Next.js** |
+| Build Command | default — **Override OFF** |
+| Output Directory | **empty** — **Override OFF** (never `public`) |
+| Install Command | default — **Override OFF** |
+
+4. Add environment variables (all 7 from Step 1a)
+5. Deploy
+
+> **Why "public" fails:** If Framework is **Other**, Vercel expects static files in a `public` output folder ([docs](https://vercel.com/docs/errors/error-list#missing-public-directory)). Next.js does not output there — `slj-erp/vercel.json` sets `"framework": "nextjs"` to force the correct builder.
 
 After any env var change, **Redeploy** — `NEXT_PUBLIC_*` values are baked in at build time.
+
+### Option A2 — Reset broken project settings (if error persists)
+
+1. Vercel → **slj-erp-01** → **Settings → Build and Deployment**
+2. Turn **OFF** every **Override** toggle (Build, Output, Install, Dev)
+3. Set Framework to **Next.js**, Root Directory to `slj-erp`
+4. Save → **Deployments** → **Redeploy**
+5. If still failing, create a **new** Vercel project from the same GitHub repo with the settings above
 
 ### Option B — Vercel CLI
 
@@ -109,6 +126,29 @@ Add these secrets in GitHub → repo → Settings → Secrets:
 Also add all 5 Supabase env vars in **Vercel project settings** (not GitHub secrets — the app reads them at runtime).
 
 Push to `main` to trigger deploy.
+
+### Option D — Alternative if dashboard settings keep failing
+
+**D1. CLI deploy from app folder** (bypasses some dashboard overrides):
+
+```bash
+cd slj-erp
+npx vercel@latest link    # select team uk6, project slj-erp-01
+npx vercel@latest --prod
+```
+
+**D2. Prebuilt deploy** (uses Vercel's Next.js builder locally):
+
+```bash
+cd slj-erp
+npx vercel@latest pull --environment=production
+npx vercel@latest build --prod
+npx vercel@latest deploy --prebuilt --prod
+```
+
+**D3. New Vercel project** — delete/relink is not required; instead create a fresh project at [vercel.com/new](https://vercel.com/new), import the same repo, set Root Directory `slj-erp`, Framework **Next.js**, add env vars, deploy.
+
+**D4. Do not** set `outputDirectory: "public"` in `vercel.json` — that causes this exact error for Next.js SSR apps.
 
 ---
 
@@ -145,6 +185,6 @@ All must be set for **Production**, **Preview**, and **Development** in Vercel, 
 | Database errors | Run `npx prisma db push` or apply SQL migration |
 | Build fails on Prisma | Ensure `DATABASE_URL` is set in Vercel env |
 | 404 NOT_FOUND | Set Root Directory to `slj-erp` in Vercel → General → Redeploy |
-| No Output Directory named "public" | Vercel → Project Settings → General → clear **Output Directory** (leave blank) and set **Framework Preset** to **Next.js**, then redeploy |
+| No Output Directory named "public" | Framework must be **Next.js** (not Other). Clear **Output Directory** override in Vercel → Build and Deployment. Ensure Root Directory is `slj-erp`. Redeploy after merging latest `main`. See [Vercel docs](https://vercel.com/docs/errors/error-list#missing-public-directory) |
 | Redirects to Vercel SSO login | Disable **Deployment Protection** for Production in Vercel → Settings → Deployment Protection |
 | "URL and Key are required" (Supabase) | Add `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel env vars, then **Redeploy** (not just Restart) |
