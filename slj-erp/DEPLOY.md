@@ -8,15 +8,28 @@
 
 ---
 
+## Your Supabase project
+
+| | |
+|---|---|
+| **Project URL** | `https://dpnkkyzfehjqxlhdgpma.supabase.co` |
+| **Project ref** | `dpnkkyzfehjqxlhdgpma` |
+| **API settings** | [Dashboard → API](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api) |
+| **Database settings** | [Dashboard → Database](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/database) |
+| **SQL Editor** | [Run migration](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/sql/new) |
+| **Create users** | [Authentication → Users](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/auth/users) |
+
+---
+
 ## Step 1 — Connect Supabase
 
 ### 1a. Get credentials
 
-In [Supabase Dashboard](https://supabase.com/dashboard) → your project:
+In [Supabase Dashboard → API](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api):
 
 | Variable | Location |
 |----------|----------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://dpnkkyzfehjqxlhdgpma.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Settings → API → anon public |
 | `SUPABASE_SERVICE_ROLE_KEY` | Settings → API → service_role |
 | `DATABASE_URL` | Settings → Database → URI (Transaction/pooler, port **6543**) |
