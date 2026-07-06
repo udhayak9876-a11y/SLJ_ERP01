@@ -36,11 +36,11 @@ Copy `.env.example` to `.env.local` and fill in values from Supabase:
 
 | Variable | Source |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API → Project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API → anon public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role key |
-| `DATABASE_URL` | Supabase → Database → Connection string (Transaction/pooler mode) |
-| `DIRECT_URL` | Supabase → Database → Connection string (Session/direct mode) |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://dpnkkyzfehjqxlhdgpma.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | [API settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api) → anon public |
+| `SUPABASE_SERVICE_ROLE_KEY` | [API settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api) → service_role |
+| `DATABASE_URL` | [Database settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/database) → Transaction (port 6543) |
+| `DIRECT_URL` | [Database settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/database) → Session (port 5432) |
 
 ### 3. Database setup
 
