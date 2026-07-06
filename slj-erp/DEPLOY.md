@@ -76,9 +76,10 @@ Supabase → Authentication → URL Configuration:
 1. Go to [vercel.com/new](https://vercel.com/new)
 2. Import `udhayak9876-a11y/SLJ_ERP01`
 3. **Root Directory** → `slj-erp` (required)
-4. Framework: Next.js (auto-detected)
-5. Add environment variables (all 5 from Step 1a)
-6. Deploy
+4. **Framework Preset** → **Next.js** (not "Other")
+5. **Output Directory** → leave **empty** (do not set `public` — Next.js uses `.next` internally)
+6. Add environment variables (all 5 from Step 1a)
+7. Deploy
 
 ### Option B — Vercel CLI
 
@@ -138,3 +139,5 @@ All must be set for **Production**, **Preview**, and **Development** in Vercel.
 | Database errors | Run `npx prisma db push` or apply SQL migration |
 | Build fails on Prisma | Ensure `DATABASE_URL` is set in Vercel env |
 | 404 NOT_FOUND | Set Root Directory to `slj-erp` in Vercel → General → Redeploy |
+| No Output Directory named "public" | Vercel → Project Settings → General → clear **Output Directory** (leave blank) and set **Framework Preset** to **Next.js**, then redeploy |
+| Redirects to Vercel SSO login | Disable **Deployment Protection** for Production in Vercel → Settings → Deployment Protection |
