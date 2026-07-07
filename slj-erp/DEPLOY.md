@@ -53,7 +53,8 @@ cp .env.example .env.local
 **Option B — SQL Editor**
 
 1. Supabase → SQL Editor → New query
-2. Paste contents of `supabase/migrations/20260706120000_init.sql`
+2. Paste contents of `supabase/migrations/20260706120000_init.sql` (fresh DB)
+   - If you get **type already exists**, use `supabase/migrations/20260707070000_repair_schema.sql` instead
 3. Run
 
 ### 1c. Create admin user

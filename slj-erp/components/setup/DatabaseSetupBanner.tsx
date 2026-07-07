@@ -37,8 +37,9 @@ export function DatabaseSetupBanner({
             <code>DIRECT_URL</code> (port 5432).
           </li>
           <li>
-            In Supabase → SQL Editor, run the full migration file{" "}
-            <code>supabase/migrations/20260706120000_init.sql</code>.
+            In Supabase → SQL Editor, run{" "}
+            <code>supabase/migrations/20260707070000_repair_schema.sql</code>{" "}
+            if <code>init.sql</code> fails with &quot;type already exists&quot;.
           </li>
           <li>Redeploy the Vercel project after saving env vars.</li>
         </ol>

@@ -21,10 +21,14 @@
 
 ## Step 1 — Create database tables (required)
 
-Tables are **not** in Supabase yet (`ShopSettings` table missing).
+If this is a **fresh** database, run `supabase/migrations/20260706120000_init.sql`.
+
+If you already tried and got **`type "Category" already exists`**, run this file instead (safe to re-run):
+
+**`supabase/migrations/20260707070000_repair_schema.sql`**
 
 1. Open [Supabase SQL Editor](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/sql/new)
-2. Copy **all** of `supabase/migrations/20260706120000_init.sql` (in this folder)
+2. Copy **all** of the chosen migration file from this folder
 3. Click **Run**
 
 You should see: Success. No rows returned.

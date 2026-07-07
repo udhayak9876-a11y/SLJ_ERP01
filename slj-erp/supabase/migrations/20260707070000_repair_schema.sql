@@ -1,29 +1,39 @@
--- Sri Lakshmi Jewellery ERP — initial schema
--- Run in Supabase SQL Editor, or via: npx prisma db push
---
--- If you get "type already exists", use instead:
---   supabase/migrations/20260707070000_repair_schema.sql
+-- Safe to re-run: creates any missing ERP schema objects.
+-- Use this if init.sql failed with "type already exists" or similar errors.
 
--- CreateEnum
-CREATE TYPE "Category" AS ENUM ('GOLD', 'SILVER', 'DIAMOND', 'STONE', 'OTHER');
+-- Enums (skip if they already exist)
+DO $$ BEGIN
+  CREATE TYPE "Category" AS ENUM ('GOLD', 'SILVER', 'DIAMOND', 'STONE', 'OTHER');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateEnum
-CREATE TYPE "MakingType" AS ENUM ('PER_GRAM', 'PERCENTAGE', 'FIXED');
+DO $$ BEGIN
+  CREATE TYPE "MakingType" AS ENUM ('PER_GRAM', 'PERCENTAGE', 'FIXED');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateEnum
-CREATE TYPE "CustomerType" AS ENUM ('RETAIL', 'WHOLESALE', 'VIP');
+DO $$ BEGIN
+  CREATE TYPE "CustomerType" AS ENUM ('RETAIL', 'WHOLESALE', 'VIP');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateEnum
-CREATE TYPE "BillType" AS ENUM ('CASH', 'CREDIT', 'EXCHANGE');
+DO $$ BEGIN
+  CREATE TYPE "BillType" AS ENUM ('CASH', 'CREDIT', 'EXCHANGE');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateEnum
-CREATE TYPE "PaymentMode" AS ENUM ('CASH', 'CARD', 'UPI', 'CHEQUE', 'MULTIPLE');
+DO $$ BEGIN
+  CREATE TYPE "PaymentMode" AS ENUM ('CASH', 'CARD', 'UPI', 'CHEQUE', 'MULTIPLE');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateEnum
-CREATE TYPE "BillStatus" AS ENUM ('DRAFT', 'CONFIRMED', 'CANCELLED');
+DO $$ BEGIN
+  CREATE TYPE "BillStatus" AS ENUM ('DRAFT', 'CONFIRMED', 'CANCELLED');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateTable
-CREATE TABLE "ShopSettings" (
+-- Tables
+CREATE TABLE IF NOT EXISTS "ShopSettings" (
     "id" TEXT NOT NULL DEFAULT 'singleton',
     "shopName" TEXT NOT NULL DEFAULT 'Sri Lakshmi Jewellery',
     "address" TEXT NOT NULL DEFAULT '',
@@ -36,12 +46,10 @@ CREATE TABLE "ShopSettings" (
     "bankDetails" TEXT NOT NULL DEFAULT '',
     "logoUrl" TEXT NOT NULL DEFAULT '',
     "financialYearStart" INTEGER NOT NULL DEFAULT 4,
-
     CONSTRAINT "ShopSettings_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "Item" (
+CREATE TABLE IF NOT EXISTS "Item" (
     "id" TEXT NOT NULL,
     "itemCode" TEXT NOT NULL,
     "itemName" TEXT NOT NULL,
@@ -53,12 +61,10 @@ CREATE TABLE "Item" (
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "notes" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
     CONSTRAINT "Item_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "Customer" (
+CREATE TABLE IF NOT EXISTS "Customer" (
     "id" TEXT NOT NULL,
     "customerCode" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -77,12 +83,10 @@ CREATE TABLE "Customer" (
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "notes" TEXT,
     "dateJoined" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
     CONSTRAINT "Customer_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "DailyRate" (
+CREATE TABLE IF NOT EXISTS "DailyRate" (
     "id" TEXT NOT NULL,
     "date" DATE NOT NULL,
     "gold24kRate" DECIMAL(10,2) NOT NULL,
@@ -92,12 +96,10 @@ CREATE TABLE "DailyRate" (
     "enteredBy" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "notes" TEXT,
-
     CONSTRAINT "DailyRate_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "SalesBill" (
+CREATE TABLE IF NOT EXISTS "SalesBill" (
     "id" TEXT NOT NULL,
     "billNumber" TEXT,
     "billDate" DATE NOT NULL,
@@ -118,12 +120,10 @@ CREATE TABLE "SalesBill" (
     "createdBy" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "notes" TEXT,
-
     CONSTRAINT "SalesBill_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "SalesBillItem" (
+CREATE TABLE IF NOT EXISTS "SalesBillItem" (
     "id" TEXT NOT NULL,
     "billId" TEXT NOT NULL,
     "itemId" TEXT NOT NULL,
@@ -146,33 +146,40 @@ CREATE TABLE "SalesBillItem" (
     "gstAmount" DECIMAL(10,2) NOT NULL,
     "lineTotal" DECIMAL(10,2) NOT NULL,
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
-
     CONSTRAINT "SalesBillItem_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "Item_itemCode_key" ON "Item"("itemCode");
+-- Indexes
+CREATE UNIQUE INDEX IF NOT EXISTS "Item_itemCode_key" ON "Item"("itemCode");
+CREATE UNIQUE INDEX IF NOT EXISTS "Customer_customerCode_key" ON "Customer"("customerCode");
+CREATE UNIQUE INDEX IF NOT EXISTS "Customer_phone_key" ON "Customer"("phone");
+CREATE UNIQUE INDEX IF NOT EXISTS "DailyRate_date_key" ON "DailyRate"("date");
+CREATE UNIQUE INDEX IF NOT EXISTS "SalesBill_billNumber_key" ON "SalesBill"("billNumber");
 
--- CreateIndex
-CREATE UNIQUE INDEX "Customer_customerCode_key" ON "Customer"("customerCode");
+-- Foreign keys (skip if already present)
+DO $$ BEGIN
+  ALTER TABLE "SalesBill"
+    ADD CONSTRAINT "SalesBill_customerId_fkey"
+    FOREIGN KEY ("customerId") REFERENCES "Customer"("id")
+    ON DELETE SET NULL ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateIndex
-CREATE UNIQUE INDEX "Customer_phone_key" ON "Customer"("phone");
+DO $$ BEGIN
+  ALTER TABLE "SalesBillItem"
+    ADD CONSTRAINT "SalesBillItem_billId_fkey"
+    FOREIGN KEY ("billId") REFERENCES "SalesBill"("id")
+    ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
--- CreateIndex
-CREATE UNIQUE INDEX "DailyRate_date_key" ON "DailyRate"("date");
-
--- CreateIndex
-CREATE UNIQUE INDEX "SalesBill_billNumber_key" ON "SalesBill"("billNumber");
-
--- AddForeignKey
-ALTER TABLE "SalesBill" ADD CONSTRAINT "SalesBill_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "SalesBillItem" ADD CONSTRAINT "SalesBillItem_billId_fkey" FOREIGN KEY ("billId") REFERENCES "SalesBill"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "SalesBillItem" ADD CONSTRAINT "SalesBillItem_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE "SalesBillItem"
+    ADD CONSTRAINT "SalesBillItem_itemId_fkey"
+    FOREIGN KEY ("itemId") REFERENCES "Item"("id")
+    ON DELETE RESTRICT ON UPDATE CASCADE;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Seed default shop settings
-INSERT INTO "ShopSettings" ("id") VALUES ('singleton') ON CONFLICT DO NOTHING;
+INSERT INTO "ShopSettings" ("id") VALUES ('singleton') ON CONFLICT ("id") DO NOTHING;
