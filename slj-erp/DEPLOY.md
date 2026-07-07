@@ -191,3 +191,4 @@ All must be set for **Production**, **Preview**, and **Development** in Vercel, 
 | "URL and Key are required" (Supabase) | Add `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel env vars, then **Redeploy** (not just Restart) |
 | Application error after login | Add `DATABASE_URL` + `DIRECT_URL` in Vercel, run SQL migration in Supabase, redeploy. Check `/api/health` |
 | Can't reach database server at :5432 | `DATABASE_URL` must be port **6543** (Transaction pooler), not 5432. Use Session URI only for `DIRECT_URL`. Redeploy. |
+| invalid port number / invalid database string | URL-encode special characters in the database password. Use `&pgbouncer=true` if URI already has `?sslmode=require`. No spaces or `[YOUR-PASSWORD]` placeholder. Redeploy. |

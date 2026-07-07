@@ -61,11 +61,23 @@ DIRECT_URL=<Session pooler, port 5432 — see below>
 | `DATABASE_URL` | **Transaction** pooler | **6543** | `aws-0-....pooler.supabase.com` |
 | `DIRECT_URL` | **Session** pooler | **5432** | `aws-0-....pooler.supabase.com` |
 
-4. For `DATABASE_URL`, append to the end of the URI:
-   ```
-   ?pgbouncer=true&connection_limit=1
-   ```
-5. Replace `[YOUR-PASSWORD]` with your database password in both URLs
+4. For `DATABASE_URL`, append pooler params:
+   - If the URI has **no** `?` yet: `?pgbouncer=true&connection_limit=1`
+   - If it already has `?sslmode=require`: `&pgbouncer=true&connection_limit=1`
+5. Replace `[YOUR-PASSWORD]` with your database password
+
+### If password has special characters (@ # % : / ?)
+
+URL-encode **only the password** before pasting into Vercel.
+
+| Password | Encoded |
+|----------|---------|
+| `P@ss#1` | `P%40ss%231` |
+| `my@pass` | `my%40pass` |
+
+In browser console: `encodeURIComponent("your-password")`
+
+**Invalid port number** error in Vercel almost always means the password broke the URL or query params were added with an extra `?`.
 
 **Common mistake:** putting the port **5432** URI in `DATABASE_URL`. That causes:
 `Can't reach database server at ...:5432` on Vercel.
