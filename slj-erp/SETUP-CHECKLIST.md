@@ -46,12 +46,34 @@ NEXT_PUBLIC_SUPABASE_URL=https://dpnkkyzfehjqxlhdgpma.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_7VBZjB_il1gU_x9cufn8Hg_v9Nyej8c
 SUPABASE_SECRET_KEY=<full sb_secret_ key from API Keys settings>
 SUPABASE_JWKS_URL=https://dpnkkyzfehjqxlhdgpma.supabase.co/auth/v1/.well-known/jwks.json
-DATABASE_URL=<Transaction mode, port 6543, add ?pgbouncer=true&connection_limit=1>
-DIRECT_URL=<Session mode, port 5432>
+DATABASE_URL=<Transaction pooler, port 6543 — see below>
+DIRECT_URL=<Session pooler, port 5432 — see below>
 ```
 
-Get keys: [API Keys settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api-keys)  
-Get database strings: [Database Settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/database)
+### Getting the database URLs (important)
+
+1. Open [Supabase Database Settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/database)
+2. Click **Connect** (or **Connection string**)
+3. Choose **URI** format
+
+| Vercel variable | Supabase setting | Port | Example host |
+|---------------|------------------|------|--------------|
+| `DATABASE_URL` | **Transaction** pooler | **6543** | `aws-0-....pooler.supabase.com` |
+| `DIRECT_URL` | **Session** pooler | **5432** | `aws-0-....pooler.supabase.com` |
+
+4. For `DATABASE_URL`, append to the end of the URI:
+   ```
+   ?pgbouncer=true&connection_limit=1
+   ```
+5. Replace `[YOUR-PASSWORD]` with your database password in both URLs
+
+**Common mistake:** putting the port **5432** URI in `DATABASE_URL`. That causes:
+`Can't reach database server at ...:5432` on Vercel.
+
+- `DATABASE_URL` = port **6543** (Transaction) — app runtime on Vercel
+- `DIRECT_URL` = port **5432** (Session) — Prisma migrations only
+
+Get keys: [API Keys settings](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/settings/api-keys)
 
 After adding/changing vars → **Redeploy** (Deployments → ⋯ → Redeploy).
 

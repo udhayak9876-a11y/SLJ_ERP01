@@ -1,17 +1,11 @@
-export function isDatabaseConfigured(): boolean {
-  const url = process.env.DATABASE_URL ?? "";
-  return Boolean(url) && !url.includes("[YOUR_DB_PASSWORD]");
-}
+import {
+  getDatabaseConfigError,
+  isDatabaseConfigured,
+  validateDatabaseUrls,
+} from "./validate";
 
-export function getDatabaseConfigError(): string | null {
-  if (!isDatabaseConfigured()) {
-    return "DATABASE_URL is not set in Vercel environment variables.";
-  }
-  if (!process.env.DIRECT_URL) {
-    return "DIRECT_URL is not set in Vercel environment variables.";
-  }
-  return null;
-}
+export { getDatabaseConfigError, isDatabaseConfigured, validateDatabaseUrls };
+export { getDatabaseConnectionHint } from "./validate";
 
 export async function safeDbCall<T>(
   label: string,
