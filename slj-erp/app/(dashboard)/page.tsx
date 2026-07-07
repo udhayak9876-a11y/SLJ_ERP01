@@ -2,6 +2,8 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { getDashboardStats, getRecentBills } from "@/lib/actions/bills";
 import { getTodayRate } from "@/lib/actions/rates";
+import { EMPTY_DASHBOARD_STATS } from "@/lib/db/defaults";
+import { safeDbCall } from "@/lib/db/safe";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,13 +15,24 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { IndianCurrency } from "@/components/shared/IndianCurrency";
+import type { SalesBill, Customer } from "@prisma/client";
+
+type RecentBill = SalesBill & { customer: Customer | null };
 
 export default async function DashboardPage() {
-  const [stats, recentBills, todayRate] = await Promise.all([
-    getDashboardStats(),
-    getRecentBills(10),
-    getTodayRate(),
+  const [statsResult, recentBillsResult, todayRateResult] = await Promise.all([
+    safeDbCall(
+      "dashboard.getDashboardStats",
+      () => getDashboardStats(),
+      EMPTY_DASHBOARD_STATS
+    ),
+    safeDbCall("dashboard.getRecentBills", () => getRecentBills(10), [] as RecentBill[]),
+    safeDbCall("dashboard.getTodayRate", () => getTodayRate(), null),
   ]);
+
+  const stats = statsResult.data;
+  const recentBills = recentBillsResult.data;
+  const todayRate = todayRateResult.data;
 
   return (
     <div className="space-y-6">

@@ -1,11 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 
 export async function getCurrentUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return user;
+  } catch (error) {
+    console.error("[slj-erp] getCurrentUser failed:", error);
+    return null;
+  }
 }
 
 export async function getCurrentUserEmail(): Promise<string> {

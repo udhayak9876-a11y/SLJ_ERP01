@@ -13,6 +13,10 @@ function getMiddlewareSupabaseEnv() {
 }
 
 export async function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname === "/api/health") {
+    return NextResponse.next();
+  }
+
   const { url: supabaseUrl, key: supabaseKey } = getMiddlewareSupabaseEnv();
 
   if (!supabaseUrl || !supabaseKey) {

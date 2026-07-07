@@ -11,8 +11,8 @@
 |------|--------|--------|
 | Vercel deployed | Done | — |
 | Supabase URL + publishable key | Done | Verify in Vercel env vars |
-| Database tables | **Not done** | Run SQL migration (Step 1 below) |
-| DATABASE_URL in Vercel | **Likely missing** | Add from Supabase (Step 2) |
+| Database tables | **Required** | Run SQL migration (Step 1 below) |
+| DATABASE_URL in Vercel | **Required** | Add from Supabase (Step 2) |
 | Admin user in Supabase | **Check** | Create user (Step 3) |
 | Auth redirect URLs | **Check** | Set Vercel domain (Step 4) |
 | Vercel Deployment Protection | **Blocking public access** | Disable (Step 5) |
@@ -42,7 +42,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://dpnkkyzfehjqxlhdgpma.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_7VBZjB_il1gU_x9cufn8Hg_v9Nyej8c
 SUPABASE_SECRET_KEY=<full sb_secret_ key from API Keys settings>
 SUPABASE_JWKS_URL=https://dpnkkyzfehjqxlhdgpma.supabase.co/auth/v1/.well-known/jwks.json
-DATABASE_URL=<Transaction mode, port 6543>
+DATABASE_URL=<Transaction mode, port 6543, add ?pgbouncer=true&connection_limit=1>
 DIRECT_URL=<Session mode, port 5432>
 ```
 
@@ -87,8 +87,10 @@ Your app currently redirects to Vercel login (not your ERP login).
 1. Open https://slj-erp-01-uk6.vercel.app/login
 2. You should see **Sri Lakshmi Jewellery** login (not Vercel login)
 3. Sign in with the Supabase admin user
-4. Go to `/rates` → enter today's gold rates
-5. Create a test bill at `/bills/new`
+4. If you see **Database setup required**, complete Steps 1–2 above and redeploy
+5. Check https://slj-erp-01-uk6.vercel.app/api/health — should return `"ok": true`
+6. Go to `/rates` → enter today's gold rates
+7. Create a test bill at `/bills/new`
 
 ---
 

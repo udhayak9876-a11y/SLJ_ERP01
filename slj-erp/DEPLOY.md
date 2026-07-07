@@ -188,3 +188,4 @@ All must be set for **Production**, **Preview**, and **Development** in Vercel, 
 | No Output Directory named "public" | Framework must be **Next.js** (not Other). Clear **Output Directory** override in Vercel → Build and Deployment. Ensure Root Directory is `slj-erp`. Redeploy after merging latest `main`. See [Vercel docs](https://vercel.com/docs/errors/error-list#missing-public-directory) |
 | Redirects to Vercel SSO login | Disable **Deployment Protection** for Production in Vercel → Settings → Deployment Protection |
 | "URL and Key are required" (Supabase) | Add `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Vercel env vars, then **Redeploy** (not just Restart) |
+| Application error after login | Add `DATABASE_URL` + `DIRECT_URL` in Vercel, run SQL migration in Supabase, redeploy. Check `/api/health` |
