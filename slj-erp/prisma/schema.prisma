@@ -36,6 +36,128 @@ model Item {
   notes             String?
   createdAt         DateTime        @default(now())
   billItems         SalesBillItem[]
+  tags              Tag[]
+}
+
+model Supplier {
+  id             String   @id @default(cuid())
+  supplierCode   String   @unique
+  companyName    String
+  contactPerson  String?
+  phone          String
+  address        String   @default("")
+  city           String   @default("")
+  state          String   @default("")
+  gstin          String?
+  panNumber      String?
+  metalTypes     String[] @default([])
+  openingBalance Decimal  @default(0) @db.Decimal(10, 2)
+  isActive       Boolean  @default(true)
+  notes          String?
+  createdBy      String
+  createdAt      DateTime @default(now())
+  updatedBy      String?
+  updatedAt      DateTime @updatedAt
+  lots           Lot[]
+
+  @@index([supplierCode])
+}
+
+model Counter {
+  id          String    @id @default(cuid())
+  counterCode String    @unique
+  counterName String
+  location    String    @default("")
+  metalType   MetalType
+  isActive    Boolean   @default(true)
+  createdBy   String
+  createdAt   DateTime  @default(now())
+  updatedBy   String?
+  updatedAt   DateTime  @updatedAt
+  tags        Tag[]
+
+  @@index([counterCode])
+  @@index([metalType])
+}
+
+model Lot {
+  id            String    @id @default(cuid())
+  lotNumber     String    @unique
+  supplierId    String?
+  supplier      Supplier? @relation(fields: [supplierId], references: [id])
+  lotDate       DateTime  @db.Date
+  metalType     MetalType
+  totalPieces   Int       @default(0)
+  totalWeight   Decimal   @default(0) @db.Decimal(10, 3)
+  invoiceNumber String?
+  purchaseRate  Decimal?  @db.Decimal(10, 2)
+  status        LotStatus @default(OPEN)
+  notes         String?
+  createdBy     String
+  createdAt     DateTime  @default(now())
+  updatedBy      String?
+  updatedAt     DateTime  @updatedAt
+  tags          Tag[]
+
+  @@index([supplierId])
+  @@index([lotDate])
+  @@index([status])
+}
+
+model Tag {
+  id               String          @id @default(cuid())
+  tagId            String          @unique
+  productId        String
+  product          Item            @relation(fields: [productId], references: [id])
+  lotId            String?
+  lot              Lot?            @relation(fields: [lotId], references: [id])
+  counterId        String?
+  counter          Counter?        @relation(fields: [counterId], references: [id])
+  grossWeight      Decimal         @db.Decimal(10, 3)
+  stoneWeight      Decimal         @default(0) @db.Decimal(10, 3)
+  netWeight        Decimal         @db.Decimal(10, 3)
+  stoneCount       Int             @default(0)
+  stoneDescription String?
+  huidNumber       String?
+  purchaseRate     Decimal?        @db.Decimal(10, 2)
+  mrp              Decimal?        @db.Decimal(10, 2)
+  status           TagStatus       @default(RECEIVED)
+  receivedDate     DateTime        @db.Date
+  soldDate         DateTime?       @db.Date
+  returnedDate     DateTime?       @db.Date
+  notes            String?
+  createdBy        String
+  createdAt        DateTime        @default(now())
+  updatedBy        String?
+  updatedAt        DateTime        @updatedAt
+  movements        StockMovement[]
+
+  @@index([productId])
+  @@index([lotId])
+  @@index([counterId])
+  @@index([status])
+  @@index([receivedDate])
+  @@index([huidNumber])
+}
+
+model StockMovement {
+  id           String            @id @default(cuid())
+  tagId        String
+  tag          Tag               @relation(fields: [tagId], references: [id])
+  movementType StockMovementType
+  fromLocation String?
+  toLocation   String?
+  weight       Decimal           @db.Decimal(10, 3)
+  date         DateTime          @db.Date
+  referenceId  String?
+  createdBy    String
+  createdAt    DateTime          @default(now())
+  updatedBy    String?
+  updatedAt    DateTime          @updatedAt
+
+  @@index([tagId])
+  @@index([movementType])
+  @@index([date])
 }
 
 model Customer {
@@ -162,4 +284,32 @@ enum BillStatus {
   DRAFT
   CONFIRMED
   CANCELLED
+}
+
+enum MetalType {
+  GOLD
+  SILVER
+  DIAMOND
+}
+
+enum TagStatus {
+  RECEIVED
+  COUNTER_ASSIGNED
+  SOLD
+  RETURNED
+  WITH_KARIGAR
+}
+
+enum LotStatus {
+  OPEN
+  CLOSED
+}
+
+enum StockMovementType {
+  PURCHASE_IN
+  SALE_OUT
+  RETURN_IN
+  KARIGAR_OUT
+  KARIGAR_IN
+  COUNTER_TRANSFER
 }
