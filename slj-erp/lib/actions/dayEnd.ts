@@ -26,7 +26,7 @@ export async function closeDayEnd(date: Date) {
   const nextDay = new Date(d);
   nextDay.setDate(nextDay.getDate() + 1);
 
-  const [salesBills, purchaseBills, oldMetal, priorDay, cashBook] =
+  const [salesBills, purchaseBills, oldMetal, chitPayments, priorDay, cashBook] =
     await Promise.all([
       prisma.salesBill.findMany({
         where: { billDate: d, status: "CONFIRMED" },
@@ -35,6 +35,7 @@ export async function closeDayEnd(date: Date) {
         where: { billDate: d, status: "CONFIRMED" },
       }),
       prisma.oldMetalPurchase.findMany({ where: { voucherDate: d } }),
+      prisma.chitPayment.findMany({ where: { paymentDate: d } }),
       prisma.dayEnd.findFirst({
         where: { date: { lt: d } },
         orderBy: { date: "desc" },
@@ -51,6 +52,10 @@ export async function closeDayEnd(date: Date) {
     (s, r) => s + Number(r.totalAmount),
     0
   );
+  const totalChitCollection = chitPayments.reduce(
+    (s, p) => s + Number(p.amount),
+    0
+  );
   const openingCash = priorDay ? Number(priorDay.closingCash) : cashBook.opening;
   const closingCash = cashBook.closing;
 
@@ -60,6 +65,8 @@ export async function closeDayEnd(date: Date) {
     purchaseCount: purchaseBills.length,
     oldMetalCount: oldMetal.length,
     oldMetalTotal,
+    chitCollectionCount: chitPayments.length,
+    chitCollectionTotal: totalChitCollection,
     cashIn: cashBook.lines.reduce((s, l) => s + l.debit, 0),
     cashOut: cashBook.lines.reduce((s, l) => s + l.credit, 0),
   };
@@ -71,7 +78,7 @@ export async function closeDayEnd(date: Date) {
       openingCash,
       totalSales,
       totalPurchases: totalPurchases + oldMetalTotal,
-      totalChitCollection: 0,
+      totalChitCollection,
       totalExpenses: 0,
       closingCash,
       isDayLocked: true,
@@ -84,6 +91,7 @@ export async function closeDayEnd(date: Date) {
       openingCash,
       totalSales,
       totalPurchases: totalPurchases + oldMetalTotal,
+      totalChitCollection,
       closingCash,
       isDayLocked: true,
       lockedBy: userEmail,

@@ -89,6 +89,27 @@ export function generateVoucherNumber(
   return `${prefix}/${fy}/${seq}`;
 }
 
+export function generateSchemeCode(sequence: number): string {
+  return `SCH-${sequence.toString().padStart(3, "0")}`;
+}
+
+export function generateChitMemberId(
+  schemeCode: string,
+  sequence: number
+): string {
+  const code = schemeCode.replace("SCH-", "SCH");
+  return `${code}-${sequence.toString().padStart(3, "0")}`;
+}
+
+export function generateChitReceiptNumber(
+  lastNumber: number,
+  date: Date = new Date()
+): string {
+  const fy = getFinancialYear(date);
+  const seq = (lastNumber + 1).toString().padStart(4, "0");
+  return `CHT/${fy}/${seq}`;
+}
+
 function getFinancialYear(date: Date): string {
   const month = date.getMonth() + 1;
   const year = date.getFullYear();

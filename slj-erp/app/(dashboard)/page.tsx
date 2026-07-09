@@ -2,10 +2,12 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { getDashboardStats, getRecentBills } from "@/lib/actions/bills";
 import { getTodayRate } from "@/lib/actions/rates";
+import { getChitReminders } from "@/lib/actions/chitMembers";
 import { EMPTY_DASHBOARD_STATS } from "@/lib/db/defaults";
 import { safeDbCall } from "@/lib/db/safe";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ChitRemindersWidget } from "@/components/schemes/ChitRemindersWidget";
 import {
   Table,
   TableBody,
@@ -20,7 +22,8 @@ import type { SalesBill, Customer } from "@prisma/client";
 type RecentBill = SalesBill & { customer: Customer | null };
 
 export default async function DashboardPage() {
-  const [statsResult, recentBillsResult, todayRateResult] = await Promise.all([
+  const [statsResult, recentBillsResult, todayRateResult, remindersResult] =
+    await Promise.all([
     safeDbCall(
       "dashboard.getDashboardStats",
       () => getDashboardStats(),
@@ -28,11 +31,13 @@ export default async function DashboardPage() {
     ),
     safeDbCall("dashboard.getRecentBills", () => getRecentBills(10), [] as RecentBill[]),
     safeDbCall("dashboard.getTodayRate", () => getTodayRate(), null),
+    safeDbCall("dashboard.getChitReminders", () => getChitReminders(7), []),
   ]);
 
   const stats = statsResult.data;
   const recentBills = recentBillsResult.data;
   const todayRate = todayRateResult.data;
+  const chitReminders = remindersResult.data;
 
   return (
     <div className="space-y-6">
@@ -121,58 +126,72 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Recent Bills</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Bill No</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Payment</TableHead>
-                <TableHead>Time</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentBills.map((bill) => (
-                <TableRow key={bill.id}>
-                  <TableCell>
-                    <Link
-                      href={`/bills/${bill.id}/print`}
-                      className="font-mono text-xs text-gold hover:underline"
-                    >
-                      {bill.billNumber}
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    {bill.customer?.name ?? bill.walkInName ?? "Walk-in"}
-                  </TableCell>
-                  <TableCell>
-                    <IndianCurrency amount={Number(bill.totalAmount)} />
-                  </TableCell>
-                  <TableCell>{bill.paymentMode}</TableCell>
-                  <TableCell className="text-xs">
-                    {format(new Date(bill.createdAt), "HH:mm")}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {recentBills.length === 0 && (
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Recent Bills</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="text-center text-muted-foreground"
-                  >
-                    No confirmed bills yet
-                  </TableCell>
+                  <TableHead>Bill No</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Payment</TableHead>
+                  <TableHead>Time</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {recentBills.map((bill) => (
+                  <TableRow key={bill.id}>
+                    <TableCell>
+                      <Link
+                        href={`/bills/${bill.id}/print`}
+                        className="font-mono text-xs text-gold hover:underline"
+                      >
+                        {bill.billNumber}
+                      </Link>
+                    </TableCell>
+                    <TableCell>
+                      {bill.customer?.name ?? bill.walkInName ?? "Walk-in"}
+                    </TableCell>
+                    <TableCell>
+                      <IndianCurrency amount={Number(bill.totalAmount)} />
+                    </TableCell>
+                    <TableCell>{bill.paymentMode}</TableCell>
+                    <TableCell className="text-xs">
+                      {format(new Date(bill.createdAt), "HH:mm")}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {recentBills.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="text-center text-muted-foreground"
+                    >
+                      No confirmed bills yet
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        <Card className={chitReminders.some((r) => r.daysUntilDue < 0) ? "border-red-300" : ""}>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-base">Chit Reminders</CardTitle>
+            <Link href="/schemes/reminders">
+              <Button variant="ghost" size="sm">View all</Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <ChitRemindersWidget reminders={chitReminders} compact />
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="flex flex-wrap gap-3">
         <Link href="/bills/new">
@@ -183,6 +202,9 @@ export default async function DashboardPage() {
         </Link>
         <Link href="/rates">
           <Button variant="outline">Enter Gold Rate</Button>
+        </Link>
+        <Link href="/schemes/collect">
+          <Button variant="outline">Collect Chit</Button>
         </Link>
       </div>
     </div>

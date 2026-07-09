@@ -296,6 +296,7 @@ model Customer {
   dateJoined     DateTime     @default(now())
   bills          SalesBill[]
   oldMetalPurchases OldMetalPurchase[]
+  chitMembers    ChitMember[]
 }
 
 model DailyRate {
@@ -495,6 +496,75 @@ model DayEnd {
   @@index([date])
 }
 
+model ChitScheme {
+  id               String           @id @default(cuid())
+  schemeCode       String           @unique
+  schemeName       String
+  durationMonths   Int
+  instalmentAmount Decimal          @db.Decimal(10, 2)
+  totalMembers     Int              @default(0)
+  startDate        DateTime         @db.Date
+  maturityDate     DateTime         @db.Date
+  bonusMonth       Int?
+  status           ChitSchemeStatus @default(ACTIVE)
+  notes            String?
+  createdBy        String
+  createdAt        DateTime         @default(now())
+  updatedBy        String?
+  updatedAt        DateTime         @updatedAt
+  members          ChitMember[]
+  payments         ChitPayment[]
+
+  @@index([status])
+  @@index([startDate])
+}
+
+model ChitMember {
+  id             String           @id @default(cuid())
+  memberId       String           @unique
+  schemeId       String
+  scheme         ChitScheme       @relation(fields: [schemeId], references: [id])
+  customerId     String
+  customer       Customer         @relation(fields: [customerId], references: [id])
+  enrolmentDate  DateTime         @db.Date
+  totalAmount    Decimal          @db.Decimal(10, 2)
+  status         ChitMemberStatus @default(ACTIVE)
+  notes          String?
+  createdBy      String
+  createdAt      DateTime         @default(now())
+  updatedBy      String?
+  updatedAt      DateTime         @updatedAt
+  payments       ChitPayment[]
+
+  @@index([schemeId])
+  @@index([customerId])
+  @@index([status])
+}
+
+model ChitPayment {
+  id                String      @id @default(cuid())
+  memberId          String
+  member            ChitMember  @relation(fields: [memberId], references: [id])
+  schemeId          String
+  scheme            ChitScheme  @relation(fields: [schemeId], references: [id])
+  paymentDate       DateTime    @db.Date
+  instalmentNumber  Int
+  amount            Decimal     @db.Decimal(10, 2)
+  paymentMode       PaymentMode @default(CASH)
+  collectedBy       String
+  receiptNumber     String      @unique
+  notes             String?
+  createdBy         String
+  createdAt         DateTime    @default(now())
+  updatedBy         String?
+  updatedAt         DateTime    @updatedAt
+
+  @@index([memberId])
+  @@index([schemeId])
+  @@index([paymentDate])
+  @@index([instalmentNumber])
+}
+
 enum Category {
   GOLD
   SILVER
@@ -587,4 +657,15 @@ enum VoucherType {
   PAYMENT
   JOURNAL
   ISSUE
+}
+
+enum ChitSchemeStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum ChitMemberStatus {
+  ACTIVE
+  CLOSED
+  DEFAULTED
 }
