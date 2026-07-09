@@ -13,6 +13,7 @@ const navItems = [
   { href: "/purchase", label: "Purchase", icon: "📥" },
   { href: "/accounting", label: "Accounts", icon: "📊" },
   { href: "/schemes", label: "Schemes", icon: "🪙" },
+  { href: "/reports", label: "Reports", icon: "📈" },
   { href: "/rates", label: "Gold Rates", icon: "💰" },
   { href: "/bills/new", label: "New Bill", icon: "🧾", highlight: true },
   { href: "/bills", label: "Bills List", icon: "📋" },
