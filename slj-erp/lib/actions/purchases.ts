@@ -18,6 +18,8 @@ import {
   PaymentMode,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { assertDayNotLocked } from "@/lib/accounting/dayLock";
+import { postPurchaseBillJournal } from "@/lib/accounting/journalService";
 
 export interface PurchaseLineInput {
   productId: string;
@@ -173,6 +175,7 @@ export async function confirmPurchaseBill(id: string) {
   if (bill.status !== "DRAFT") {
     throw new Error("Only draft bills can be confirmed");
   }
+  await assertDayNotLocked(bill.billDate);
   if (bill.items.length === 0) {
     throw new Error("Bill has no items");
   }
@@ -279,6 +282,16 @@ export async function confirmPurchaseBill(id: string) {
   revalidatePath(`/purchase/bills/${id}`);
   revalidatePath("/stock/tags");
   revalidatePath("/stock/lots");
+  revalidatePath("/accounting");
+
+  const confirmed = await prisma.purchaseBill.findUniqueOrThrow({
+    where: { id },
+  });
+  try {
+    await postPurchaseBillJournal(confirmed);
+  } catch (e) {
+    console.error("[slj-erp] Purchase journal posting failed:", e);
+  }
 }
 
 export async function cancelPurchaseBill(id: string, reason: string) {

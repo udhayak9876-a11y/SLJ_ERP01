@@ -70,6 +70,25 @@ export function generatePurchaseReturnNumber(
   return `PRT/${fy}/${seq}`;
 }
 
+export function generateJournalNumber(
+  lastNumber: number,
+  date: Date = new Date()
+): string {
+  const fy = getFinancialYear(date);
+  const seq = (lastNumber + 1).toString().padStart(4, "0");
+  return `JRN/${fy}/${seq}`;
+}
+
+export function generateVoucherNumber(
+  prefix: string,
+  lastNumber: number,
+  date: Date = new Date()
+): string {
+  const fy = getFinancialYear(date);
+  const seq = (lastNumber + 1).toString().padStart(4, "0");
+  return `${prefix}/${fy}/${seq}`;
+}
+
 function getFinancialYear(date: Date): string {
   const month = date.getMonth() + 1;
   const year = date.getFullYear();

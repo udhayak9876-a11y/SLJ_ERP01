@@ -10,6 +10,8 @@ import { getFinancialYearDateRange } from "@/lib/utils/billNumber";
 import { roundMoney, roundWeight } from "@/lib/utils/weight";
 import { MetalType, PaymentMode } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { assertDayNotLocked } from "@/lib/accounting/dayLock";
+import { postOldMetalJournal } from "@/lib/accounting/journalService";
 
 export interface CreateOldMetalInput {
   voucherDate: Date;
@@ -61,6 +63,7 @@ export async function getOldMetalPurchase(id: string) {
 
 export async function createOldMetalPurchase(input: CreateOldMetalInput) {
   const userEmail = await getCurrentUserEmail();
+  await assertDayNotLocked(input.voucherDate);
   const netWeight = roundWeight(input.grossWeight - input.stoneWeight);
   const effectiveWeight = roundWeight(netWeight * (input.purity / 100));
   const totalAmount = roundMoney(effectiveWeight * input.ratePerGram);
@@ -89,6 +92,14 @@ export async function createOldMetalPurchase(input: CreateOldMetalInput) {
   });
 
   revalidatePath("/purchase/old-metal");
+  revalidatePath("/accounting");
+
+  try {
+    await postOldMetalJournal(record);
+  } catch (e) {
+    console.error("[slj-erp] Old metal journal posting failed:", e);
+  }
+
   return record;
 }
 

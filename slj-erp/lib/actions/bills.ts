@@ -17,6 +17,8 @@ import {
   PaymentMode,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { assertDayNotLocked } from "@/lib/accounting/dayLock";
+import { postSalesBillJournal } from "@/lib/accounting/journalService";
 
 export interface BillLineInput {
   itemId: string;
@@ -102,6 +104,7 @@ function calculateBillTotals(
 
 export async function createBill(input: CreateBillInput) {
   const email = await getCurrentUserEmail();
+  await assertDayNotLocked(input.billDate);
   const totals = calculateBillTotals(
     input.items,
     input.customerState,
@@ -167,6 +170,16 @@ export async function createBill(input: CreateBillInput) {
 
   revalidatePath("/bills");
   revalidatePath("/");
+  revalidatePath("/accounting");
+
+  if (input.status === "CONFIRMED") {
+    try {
+      await postSalesBillJournal(bill);
+    } catch (e) {
+      console.error("[slj-erp] Sales journal posting failed:", e);
+    }
+  }
+
   return bill;
 }
 

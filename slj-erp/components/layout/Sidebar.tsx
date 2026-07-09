@@ -11,6 +11,7 @@ const navItems = [
   { href: "/customers", label: "Customers", icon: "👥" },
   { href: "/stock", label: "Stock", icon: "🏷️" },
   { href: "/purchase", label: "Purchase", icon: "📥" },
+  { href: "/accounting", label: "Accounts", icon: "📊" },
   { href: "/rates", label: "Gold Rates", icon: "💰" },
   { href: "/bills/new", label: "New Bill", icon: "🧾", highlight: true },
   { href: "/bills", label: "Bills List", icon: "📋" },
