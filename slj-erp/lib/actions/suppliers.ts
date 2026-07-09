@@ -61,7 +61,7 @@ export async function createSupplier(data: {
       updatedBy: userEmail,
     },
   });
-  revalidatePath("/stock/suppliers");
+  revalidatePath("/purchase/suppliers");
   return supplier;
 }
 
@@ -71,5 +71,5 @@ export async function toggleSupplierActive(id: string, isActive: boolean) {
     where: { id },
     data: { isActive, updatedBy: userEmail },
   });
-  revalidatePath("/stock/suppliers");
+  revalidatePath("/purchase/suppliers");
 }

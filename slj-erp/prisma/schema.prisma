@@ -37,6 +37,7 @@ model Item {
   createdAt         DateTime        @default(now())
   billItems         SalesBillItem[]
   tags              Tag[]
+  purchaseBillItems PurchaseBillItem[]
 }
 
 model Supplier {
@@ -59,6 +60,8 @@ model Supplier {
   updatedBy      String?
   updatedAt      DateTime @updatedAt
   lots           Lot[]
+  purchaseBills  PurchaseBill[]
+  purchaseReturns PurchaseReturn[]
 
   @@index([supplierCode])
 }
@@ -98,6 +101,7 @@ model Lot {
   updatedBy      String?
   updatedAt     DateTime  @updatedAt
   tags          Tag[]
+  purchaseBill  PurchaseBill?
 
   @@index([supplierId])
   @@index([lotDate])
@@ -131,6 +135,8 @@ model Tag {
   updatedBy        String?
   updatedAt        DateTime        @updatedAt
   movements        StockMovement[]
+  purchaseBillItem PurchaseBillItem?
+  purchaseReturnItem PurchaseReturnItem?
 
   @@index([productId])
   @@index([lotId])
@@ -160,6 +166,115 @@ model StockMovement {
   @@index([date])
 }
 
+model PurchaseBill {
+  id            String             @id @default(cuid())
+  billNumber    String?            @unique
+  billDate      DateTime           @db.Date
+  supplierId    String
+  supplier      Supplier           @relation(fields: [supplierId], references: [id])
+  invoiceNumber String?
+  metalType     MetalType
+  lotId         String?            @unique
+  lot           Lot?               @relation(fields: [lotId], references: [id])
+  totalPieces   Int                @default(0)
+  totalWeight   Decimal            @default(0) @db.Decimal(10, 3)
+  totalAmount   Decimal            @default(0) @db.Decimal(10, 2)
+  paymentMode   PaymentMode        @default(CASH)
+  status        BillStatus         @default(DRAFT)
+  notes         String?
+  createdBy     String
+  createdAt     DateTime           @default(now())
+  updatedBy     String?
+  updatedAt     DateTime           @updatedAt
+  items         PurchaseBillItem[]
+  returns       PurchaseReturn[]
+
+  @@index([supplierId])
+  @@index([billDate])
+  @@index([status])
+}
+
+model PurchaseBillItem {
+  id           String       @id @default(cuid())
+  billId       String
+  bill         PurchaseBill @relation(fields: [billId], references: [id], onDelete: Cascade)
+  tagId        String?      @unique
+  tag          Tag?         @relation(fields: [tagId], references: [id])
+  productId    String
+  product      Item         @relation(fields: [productId], references: [id])
+  grossWeight  Decimal      @db.Decimal(10, 3)
+  stoneWeight  Decimal      @default(0) @db.Decimal(10, 3)
+  netWeight    Decimal      @db.Decimal(10, 3)
+  huidNumber   String?
+  purchaseRate Decimal      @db.Decimal(10, 2)
+  amount       Decimal      @db.Decimal(10, 2)
+  sortOrder    Int          @default(0)
+
+  @@index([billId])
+  @@index([productId])
+}
+
+model OldMetalPurchase {
+  id              String      @id @default(cuid())
+  voucherNumber   String?     @unique
+  voucherDate     DateTime    @db.Date
+  customerId      String?
+  customer        Customer?   @relation(fields: [customerId], references: [id])
+  customerName    String?
+  metalType       MetalType
+  karat           String?
+  itemDescription String
+  grossWeight     Decimal     @db.Decimal(10, 3)
+  stoneWeight     Decimal     @default(0) @db.Decimal(10, 3)
+  netWeight       Decimal     @db.Decimal(10, 3)
+  purity          Decimal     @db.Decimal(5, 2)
+  ratePerGram     Decimal     @db.Decimal(10, 2)
+  totalAmount     Decimal     @db.Decimal(10, 2)
+  paymentMode     PaymentMode @default(CASH)
+  notes           String?
+  createdBy       String
+  createdAt       DateTime    @default(now())
+  updatedBy       String?
+  updatedAt       DateTime    @updatedAt
+
+  @@index([voucherDate])
+  @@index([customerId])
+  @@index([metalType])
+}
+
+model PurchaseReturn {
+  id             String               @id @default(cuid())
+  returnNumber   String?              @unique
+  originalBillId String
+  originalBill   PurchaseBill         @relation(fields: [originalBillId], references: [id])
+  returnDate     DateTime             @db.Date
+  supplierId     String
+  supplier       Supplier             @relation(fields: [supplierId], references: [id])
+  reason         String
+  status         BillStatus           @default(DRAFT)
+  notes          String?
+  createdBy      String
+  createdAt      DateTime             @default(now())
+  updatedBy      String?
+  updatedAt      DateTime             @updatedAt
+  items          PurchaseReturnItem[]
+
+  @@index([originalBillId])
+  @@index([supplierId])
+  @@index([returnDate])
+  @@index([status])
+}
+
+model PurchaseReturnItem {
+  id       String         @id @default(cuid())
+  returnId String
+  return   PurchaseReturn @relation(fields: [returnId], references: [id], onDelete: Cascade)
+  tagId    String         @unique
+  tag      Tag            @relation(fields: [tagId], references: [id])
+
+  @@index([returnId])
+}
+
 model Customer {
   id             String       @id @default(cuid())
   customerCode   String       @unique
@@ -180,6 +295,7 @@ model Customer {
   notes          String?
   dateJoined     DateTime     @default(now())
   bills          SalesBill[]
+  oldMetalPurchases OldMetalPurchase[]
 }
 
 model DailyRate {
