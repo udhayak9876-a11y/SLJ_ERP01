@@ -42,7 +42,7 @@ export function ReportDateFilter({ dateISO }: ReportDateFilterProps) {
           className="w-[180px]"
         />
       </div>
-      <Button type="submit" variant="outline">
+      <Button type="submit" variant="outline" className="no-print">
         Go
       </Button>
     </form>

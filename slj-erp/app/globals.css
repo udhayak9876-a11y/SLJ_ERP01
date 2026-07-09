@@ -38,10 +38,24 @@
 }
 
 @media print {
-  .no-print {
+  .no-print,
+  aside,
+  header {
     display: none !important;
   }
   body {
     background: white !important;
+    color: black !important;
+  }
+  main {
+    margin-left: 0 !important;
+    padding: 0.5rem !important;
+    overflow: visible !important;
+  }
+  table {
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
   }
 }

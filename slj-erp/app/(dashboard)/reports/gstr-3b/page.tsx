@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getGstr3BSummary } from "@/lib/actions/complianceReports";
 import { getShopSettings } from "@/lib/actions/settings";
 import { ReportPeriodFilter } from "@/components/reports/ReportPeriodFilter";
+import { ReportFilterSkeleton } from "@/components/reports/ReportFilterSkeleton";
 import { PrintButton } from "@/components/shared/PrintButton";
 import { IndianCurrency } from "@/components/shared/IndianCurrency";
 import {
@@ -46,7 +47,7 @@ export default async function Gstr3BPage({
           </p>
         </div>
         <div className="flex items-end gap-2">
-          <Suspense>
+          <Suspense fallback={<ReportFilterSkeleton />}>
             <ReportPeriodFilter year={year} month={month} options={options} />
           </Suspense>
           <PrintButton />

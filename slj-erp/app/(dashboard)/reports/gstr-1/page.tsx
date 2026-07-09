@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getGstr1Report } from "@/lib/actions/complianceReports";
 import { getShopSettings } from "@/lib/actions/settings";
 import { ReportPeriodFilter } from "@/components/reports/ReportPeriodFilter";
+import { ReportFilterSkeleton } from "@/components/reports/ReportFilterSkeleton";
 import { PrintButton } from "@/components/shared/PrintButton";
 import { IndianCurrency } from "@/components/shared/IndianCurrency";
 import { Button } from "@/components/ui/button";
@@ -47,10 +48,10 @@ export default async function Gstr1Page({
           </p>
         </div>
         <div className="flex flex-wrap items-end gap-2">
-          <Suspense>
+          <Suspense fallback={<ReportFilterSkeleton />}>
             <ReportPeriodFilter year={year} month={month} options={options} />
           </Suspense>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="no-print">
             <a href={`/api/reports/gstr-1?year=${year}&month=${month}`}>
               Download CSV
             </a>

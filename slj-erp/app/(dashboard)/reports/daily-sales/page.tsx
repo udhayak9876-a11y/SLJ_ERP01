@@ -4,6 +4,7 @@ import { getDailySalesSummary } from "@/lib/actions/complianceReports";
 import { getShopSettings } from "@/lib/actions/settings";
 import { DailySalesSummaryView } from "@/components/reports/DailySalesSummaryView";
 import { ReportDateFilter } from "@/components/reports/ReportDateFilter";
+import { ReportFilterSkeleton } from "@/components/reports/ReportFilterSkeleton";
 import { PrintButton } from "@/components/shared/PrintButton";
 import { parseReportDate } from "@/lib/utils/reportPeriod";
 
@@ -34,7 +35,7 @@ export default async function DailySalesPage({
           </p>
         </div>
         <div className="flex items-end gap-2">
-          <Suspense>
+          <Suspense fallback={<ReportFilterSkeleton />}>
             <ReportDateFilter dateISO={summary.dateISO} />
           </Suspense>
           <PrintButton />

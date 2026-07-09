@@ -271,7 +271,7 @@ export async function getDashboardStats() {
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const [todayBills, draftCount, outstanding] = await Promise.all([
+  const [todayBills, draftCount, outstanding, chitPayments] = await Promise.all([
     prisma.salesBill.findMany({
       where: {
         billDate: { gte: today, lt: tomorrow },
@@ -283,6 +283,9 @@ export async function getDashboardStats() {
       where: { status: "CONFIRMED" },
       _sum: { balanceDue: true },
     }),
+    prisma.chitPayment.findMany({
+      where: { paymentDate: { gte: today, lt: tomorrow } },
+    }),
   ]);
 
   const todaySales = todayBills.reduce(
@@ -292,11 +295,21 @@ export async function getDashboardStats() {
   const cashCollected = todayBills
     .filter((b) => b.paymentMode === "CASH")
     .reduce((sum, b) => sum + Number(b.amountPaid), 0);
+  const salesCollected = todayBills.reduce(
+    (sum, b) => sum + Number(b.amountPaid),
+    0
+  );
+  const chitCollected = chitPayments.reduce(
+    (sum, p) => sum + Number(p.amount),
+    0
+  );
 
   return {
     todaySalesCount: todayBills.length,
     todaySalesTotal: todaySales,
     cashCollected,
+    totalCollected: salesCollected + chitCollected,
+    chitCollected,
     pendingDrafts: draftCount,
     outstanding: Number(outstanding._sum.balanceDue || 0),
   };

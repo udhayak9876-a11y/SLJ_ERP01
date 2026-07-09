@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getSalesRegister } from "@/lib/actions/complianceReports";
 import { getShopSettings } from "@/lib/actions/settings";
 import { ReportPeriodFilter } from "@/components/reports/ReportPeriodFilter";
+import { ReportFilterSkeleton } from "@/components/reports/ReportFilterSkeleton";
 import { PrintButton } from "@/components/shared/PrintButton";
 import { IndianCurrency } from "@/components/shared/IndianCurrency";
 import { WeightDisplay } from "@/components/shared/WeightDisplay";
@@ -63,7 +64,7 @@ export default async function SalesRegisterPage({
           </p>
         </div>
         <div className="flex flex-wrap items-end gap-2">
-          <Suspense>
+          <Suspense fallback={<ReportFilterSkeleton />}>
             <ReportPeriodFilter year={year} month={month} options={options} />
           </Suspense>
           <PrintButton />

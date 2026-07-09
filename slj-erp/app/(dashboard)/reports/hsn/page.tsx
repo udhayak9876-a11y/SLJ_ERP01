@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getHsnSummary } from "@/lib/actions/complianceReports";
 import { getShopSettings } from "@/lib/actions/settings";
 import { ReportPeriodFilter } from "@/components/reports/ReportPeriodFilter";
+import { ReportFilterSkeleton } from "@/components/reports/ReportFilterSkeleton";
 import { PrintButton } from "@/components/shared/PrintButton";
 import { IndianCurrency } from "@/components/shared/IndianCurrency";
 import { WeightDisplay } from "@/components/shared/WeightDisplay";
@@ -33,14 +34,14 @@ export default async function HsnReportPage({
 
   const totals = report.rows.reduce(
     (acc, row) => ({
-      quantity: acc.quantity + row.totalQuantity,
       value: acc.value + row.totalValue,
       taxable: acc.taxable + row.taxableValue,
       cgst: acc.cgst + row.cgst,
       sgst: acc.sgst + row.sgst,
       igst: acc.igst + row.igst,
+      lines: acc.lines + row.lineCount,
     }),
-    { quantity: 0, value: 0, taxable: 0, cgst: 0, sgst: 0, igst: 0 }
+    { value: 0, taxable: 0, cgst: 0, sgst: 0, igst: 0, lines: 0 }
   );
 
   return (
@@ -59,7 +60,7 @@ export default async function HsnReportPage({
           </p>
         </div>
         <div className="flex items-end gap-2">
-          <Suspense>
+          <Suspense fallback={<ReportFilterSkeleton />}>
             <ReportPeriodFilter year={year} month={month} options={options} />
           </Suspense>
           <PrintButton />
@@ -122,9 +123,7 @@ export default async function HsnReportPage({
               ))}
               <TableRow className="bg-gray-50 font-semibold">
                 <TableCell colSpan={3}>Total</TableCell>
-                <TableCell>
-                  <WeightDisplay weight={totals.quantity} />
-                </TableCell>
+                <TableCell>—</TableCell>
                 <TableCell>
                   <IndianCurrency amount={totals.value} />
                 </TableCell>
@@ -140,7 +139,7 @@ export default async function HsnReportPage({
                 <TableCell>
                   <IndianCurrency amount={totals.igst} />
                 </TableCell>
-                <TableCell />
+                <TableCell>{totals.lines}</TableCell>
               </TableRow>
             </>
           )}

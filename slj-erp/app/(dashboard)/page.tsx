@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { format } from "date-fns";
+import { toISODate } from "@/lib/utils/date";
 import { getDashboardStats, getRecentBills } from "@/lib/actions/bills";
 import { getTodayRate } from "@/lib/actions/rates";
 import { getChitReminders } from "@/lib/actions/chitMembers";
@@ -17,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { IndianCurrency } from "@/components/shared/IndianCurrency";
+import { formatINR } from "@/lib/utils/currency";
 import type { SalesBill, Customer } from "@prisma/client";
 
 type RecentBill = SalesBill & { customer: Customer | null };
@@ -43,7 +45,7 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Dashboard</h2>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -62,13 +64,29 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Cash Collected
+              Collected Today
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              <IndianCurrency amount={stats.cashCollected} />
+              <IndianCurrency amount={stats.totalCollected} />
             </p>
+            <p className="text-xs text-muted-foreground">
+              Sales + chit · Cash {formatINR(stats.cashCollected)}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Chit Collection
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">
+              <IndianCurrency amount={stats.chitCollected} />
+            </p>
+            <p className="text-xs text-muted-foreground">Today</p>
           </CardContent>
         </Card>
         <Card>
@@ -197,14 +215,20 @@ export default async function DashboardPage() {
         <Link href="/bills/new">
           <Button>+ New Sale Bill</Button>
         </Link>
+        <Link href={`/reports/daily-sales?date=${toISODate(new Date())}`}>
+          <Button variant="outline">Daily Summary</Button>
+        </Link>
+        <Link href="/schemes/collect">
+          <Button variant="outline">Collect Chit</Button>
+        </Link>
         <Link href="/customers/new">
           <Button variant="outline">+ Add Customer</Button>
         </Link>
         <Link href="/rates">
           <Button variant="outline">Enter Gold Rate</Button>
         </Link>
-        <Link href="/schemes/collect">
-          <Button variant="outline">Collect Chit</Button>
+        <Link href="/reports">
+          <Button variant="outline">Reports</Button>
         </Link>
       </div>
     </div>

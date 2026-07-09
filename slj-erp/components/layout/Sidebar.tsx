@@ -24,11 +24,20 @@ interface SidebarProps {
   gold22kRate: number | null;
 }
 
+function getActiveNavHref(pathname: string): string {
+  const matches = navItems.filter((item) => {
+    if (item.href === "/") return pathname === "/";
+    return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  });
+  return matches.sort((a, b) => b.href.length - a.href.length)[0]?.href ?? "";
+}
+
 export function Sidebar({ gold22kRate }: SidebarProps) {
   const pathname = usePathname();
+  const activeHref = getActiveNavHref(pathname);
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-60 flex-col bg-navy text-white">
+    <aside className="no-print fixed left-0 top-0 z-40 flex h-screen w-60 flex-col bg-navy text-white">
       <div className="border-b border-white/10 p-4">
         <h2 className="text-sm font-bold leading-tight">Sri Lakshmi</h2>
         <p className="text-xs text-white/70">Jewellery ERP</p>
@@ -36,10 +45,7 @@ export function Sidebar({ gold22kRate }: SidebarProps) {
 
       <nav className="flex-1 overflow-y-auto p-2">
         {navItems.map((item) => {
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
+          const isActive = item.href === activeHref;
 
           return (
             <Link

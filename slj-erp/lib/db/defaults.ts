@@ -19,6 +19,8 @@ export const EMPTY_DASHBOARD_STATS = {
   todaySalesCount: 0,
   todaySalesTotal: 0,
   cashCollected: 0,
+  totalCollected: 0,
+  chitCollected: 0,
   pendingDrafts: 0,
   outstanding: 0,
 };

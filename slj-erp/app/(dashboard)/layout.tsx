@@ -36,12 +36,12 @@ export default async function DashboardLayout({
       <Sidebar
         gold22kRate={todayRate ? Number(todayRate.gold22kRate) : null}
       />
-      <div className="ml-60 flex min-h-screen flex-col">
+      <div className="ml-60 flex min-h-screen flex-col print:ml-0">
         <Header
           shopName={settings.shopName}
           userEmail={user?.email ?? ""}
         />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 print:p-2">
           {dbError && (
             <div className="mb-6">
               <DatabaseSetupBanner

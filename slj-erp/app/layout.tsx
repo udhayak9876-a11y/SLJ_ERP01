@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   description: "Billing ERP for Sri Lakshmi Jewellery, Tiruppur",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

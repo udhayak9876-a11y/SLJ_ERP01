@@ -214,14 +214,11 @@ export async function getHsnSummary(
 
   for (const bill of bills) {
     const billTaxable = Number(bill.subtotal) - Number(bill.discountAmount);
-    const billGst =
-      Number(bill.cgstAmount) + Number(bill.sgstAmount) + Number(bill.igstAmount);
 
     for (const line of bill.items) {
       const hsn = line.item.hsnCode || "7113";
       const key = hsn;
       const lineTaxable = Number(line.taxableAmount);
-      const lineGst = Number(line.gstAmount);
       const share =
         billTaxable > 0 ? lineTaxable / billTaxable : 1 / bill.items.length;
       const cgst = round2(Number(bill.cgstAmount) * share);
@@ -254,9 +251,6 @@ export async function getHsnSummary(
       existing.igst = round2(existing.igst + igst);
       existing.lineCount += 1;
       map.set(key, existing);
-
-      void billGst;
-      void lineGst;
     }
   }
 
