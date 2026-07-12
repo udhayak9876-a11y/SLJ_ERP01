@@ -36,10 +36,10 @@ export default async function DashboardPage() {
     safeDbCall("dashboard.getChitReminders", () => getChitReminders(7), []),
   ]);
 
-  const stats = statsResult.data;
-  const recentBills = recentBillsResult.data;
+  const stats = statsResult.data ?? EMPTY_DASHBOARD_STATS;
+  const recentBills = recentBillsResult.data ?? [];
   const todayRate = todayRateResult.data;
-  const chitReminders = remindersResult.data;
+  const chitReminders = remindersResult.data ?? [];
 
   return (
     <div className="space-y-6">
@@ -69,10 +69,10 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              <IndianCurrency amount={stats.totalCollected} />
+              <IndianCurrency amount={stats.totalCollected ?? 0} />
             </p>
             <p className="text-xs text-muted-foreground">
-              Sales + chit · Cash {formatINR(stats.cashCollected)}
+              Sales + chit · Cash {formatINR(stats.cashCollected ?? 0)}
             </p>
           </CardContent>
         </Card>
@@ -84,7 +84,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">
-              <IndianCurrency amount={stats.chitCollected} />
+              <IndianCurrency amount={stats.chitCollected ?? 0} />
             </p>
             <p className="text-xs text-muted-foreground">Today</p>
           </CardContent>

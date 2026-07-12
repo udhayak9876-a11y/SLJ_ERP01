@@ -283,9 +283,11 @@ export async function getDashboardStats() {
       where: { status: "CONFIRMED" },
       _sum: { balanceDue: true },
     }),
-    prisma.chitPayment.findMany({
-      where: { paymentDate: { gte: today, lt: tomorrow } },
-    }),
+    prisma.chitPayment
+      .findMany({
+        where: { paymentDate: { gte: today, lt: tomorrow } },
+      })
+      .catch(() => [] as Awaited<ReturnType<typeof prisma.chitPayment.findMany>>),
   ]);
 
   const todaySales = todayBills.reduce(

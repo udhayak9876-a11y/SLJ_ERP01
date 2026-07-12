@@ -21,17 +21,22 @@
 
 ## Step 1 — Create database tables (required)
 
-If this is a **fresh** database, run `supabase/migrations/20260706120000_init.sql`.
+Run **all** migration files in this order in Supabase SQL Editor:
 
-If you already tried and got **`type "Category" already exists`**, run this file instead (safe to re-run):
-
-**`supabase/migrations/20260707070000_repair_schema.sql`**
+| Order | File | Module |
+|-------|------|--------|
+| 1 | `20260706120000_init.sql` | Core (items, customers, bills) |
+| 1b | `20260707070000_repair_schema.sql` | **Only if** step 1 fails with "type already exists" |
+| 2 | `20260709120000_stock_module.sql` | Stock & tags |
+| 3 | `20260709140000_purchase_module.sql` | Purchase & old gold |
+| 4 | `20260709160000_accounting_module.sql` | Accounting |
+| 5 | `20260709180000_chit_scheme_module.sql` | Gold saving scheme |
 
 1. Open [Supabase SQL Editor](https://supabase.com/dashboard/project/dpnkkyzfehjqxlhdgpma/sql/new)
-2. Copy **all** of the chosen migration file from this folder
-3. Click **Run**
+2. Copy **all** of each migration file from `supabase/migrations/` and click **Run**
+3. Repeat for each file in the table above
 
-You should see: Success. No rows returned.
+Verify: open `https://slj-erp-01.vercel.app/api/health` — should show `"ok": true` and `"migrations": { "complete": true }`.
 
 ---
 
